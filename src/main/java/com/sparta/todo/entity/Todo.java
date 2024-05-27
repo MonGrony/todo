@@ -15,20 +15,20 @@ public class Todo extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long todoId;
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
     private String content;
     @Column(nullable = false)
-    private String writer;
+    private String manager;
     @Column(nullable = false)
     private String password;
 
     public Todo(TodoRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
-        this.writer = requestDto.getWriter();
+        this.manager = requestDto.getManager();
         this.password = requestDto.getPassword();
     }
 

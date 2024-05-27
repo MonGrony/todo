@@ -5,19 +5,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
-@Table(name="comment")
+@Entity
 @NoArgsConstructor
-public class Comment extends Timestamped{
+@Table(name = "user")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentId;
+    private Long userId;
     @Column(nullable = false)
-    private String commentContent;
+    private String nickName;
     @Column(nullable = false)
-    private String userId;
+    private String userName;
+    @Column(nullable = false)
+    private String password;
+    @Column(nullable = false)
+    private String authority;
 
 }

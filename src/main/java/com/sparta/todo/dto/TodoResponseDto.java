@@ -11,18 +11,18 @@ import java.time.LocalDateTime;
 @Getter
 public class TodoResponseDto {
 
-    private Long id;
+    private Long todoId;
     private String title;
     private String content;
-    private String writer;
+    private String manager;
 
     private LocalDateTime createdAt;
 
     public TodoResponseDto(Todo todo) {
-        this.id = todo.getId();
+        this.todoId = todo.getTodoId();
         this.title = todo.getTitle();
         this.content = todo.getContent();
-        this.writer = todo.getWriter();
+        this.manager = todo.getManager();
 
         this.createdAt = todo.getCreatedAt();
 

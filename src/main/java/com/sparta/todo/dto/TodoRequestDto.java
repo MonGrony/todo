@@ -10,7 +10,7 @@ public class TodoRequestDto {
 
     private String title;
     private String content;
-    private String writer;
+    private String manager;
     private String password;
 
 }
