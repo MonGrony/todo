@@ -19,6 +19,8 @@ public class User {
     private String nickName;
     @Column(nullable = false)
     private String userName;
+    @Enumerated(EnumType.STRING)
+    private UserRoleType roleType;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)

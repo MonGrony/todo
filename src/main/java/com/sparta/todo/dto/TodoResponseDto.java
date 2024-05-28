@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class TodoResponseDto {
 
     private Long todoId;
+    private String userId;
     private String title;
     private String content;
     private String manager;
