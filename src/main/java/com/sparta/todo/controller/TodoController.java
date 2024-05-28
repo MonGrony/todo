@@ -35,6 +35,12 @@ public class TodoController {
                 return todoService.getTodoList(userId, requestDto);
         }
 
+        //등록된 일정 선택 수정
+        @PostMapping("/todo/{todoId}")
+        public TodoResponseDto modifyTodo(@RequestParam Long todoId , @RequestBody CreateTodoRequestDto requestDto) {
+                return todoService.modifyTodo(todoId, requestDto);
+        }
+
 
 
 }

@@ -8,7 +8,7 @@ import lombok.Getter;
 public class CreateTodoRequestDto {
 
     private String title;
-    private String userId;
+    private Long userId;
     private String content;
     private String manager;
     private String password;

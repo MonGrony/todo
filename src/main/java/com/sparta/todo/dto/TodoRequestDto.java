@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class TodoRequestDto { //사용자 입장
 
-    private String userId;
+    private Long userId;
     private String password;
 
 }
