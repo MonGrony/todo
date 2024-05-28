@@ -40,21 +40,7 @@ public class TodoService {
         String ps = requestDto.getPassword();
         List<TodoResponseDto> allTodoList = new ArrayList<>();
 
-        //userRepository 에서 userId 로 존재확인 후, 그 userId 의 password 와 일치하는지 확인
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new RuntimeException("해당 사용자를 찾을 수 없습니다.");
-        }
-
-        //password 일치가 확인되면 사용자가 입력했던 todo를 모두 보여준다
-        if (!user.get().getPassword().equals(ps)) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
-
-        List<Todo> todoList  = todoRepository.findAllByUserId(userId);
-        if (todoList.isEmpty()) {
-            throw new RuntimeException("등록된 일정이 없습니다.");
-        }
+        List<Todo> todoList = check(userId, ps);
 
         for (Todo todo : todoList) {
             TodoResponseDto responseDto = new TodoResponseDto(todo);
@@ -69,20 +55,7 @@ public class TodoService {
         String ps = requestDto.getPassword();
         TodoResponseDto responseDto = new TodoResponseDto();
 
-        //userId 확인, password 확인 후 userId 에 등록된 todoList 에서 todoId 에 해당하는 것을 수정
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new RuntimeException("해당 사용자를 찾을 수 없습니다.");
-        }
-
-        if (!user.get().getPassword().equals(ps)) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-        }
-
-        List<Todo> todoList = todoRepository.findAllByUserId(userId);
-        if (todoList.isEmpty()) {
-            throw new RuntimeException("등록된 일정이 없습니다.");
-        }
+        List<Todo> todoList = check(userId, ps);
 
         //password 일치하므로 그 user 의 일정 중에서 todoId 로 찾은 게시글 수정
 
@@ -97,5 +70,22 @@ public class TodoService {
     }
 
     //등록된 userId 인지, 그 userId 에 맞는 password 인지, userId 에 등록된 일정이 있는지, 확인하는 메서드 (예정)
+    private List<Todo> check(Long userId, String password) {
+
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new RuntimeException("해당 사용자를 찾을 수 없습니다.");
+        }
+
+        if (!user.get().getPassword().equals(password)) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        List<Todo> todoList = todoRepository.findAllByUserId(userId);
+        if (todoList.isEmpty()) {
+            throw new RuntimeException("등록된 일정이 없습니다.");
+        }
+        return todoList;
+    }
 }
 
