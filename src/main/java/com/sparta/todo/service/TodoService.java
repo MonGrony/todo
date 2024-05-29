@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -43,12 +41,16 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         String ps = requestDto.getPassword();
         List<TodoResponseDto> allTodoList = new ArrayList<>();
 
-        List<Todo> todoList = check(userId, ps);
+        check(userId, ps);
+        List<Todo> todoList = getTodoList(userId);
+        todoList.sort(Collections.reverseOrder());
 
         for (Todo todo : todoList) {
             TodoResponseDto responseDto = new TodoResponseDto(todo);
             allTodoList.add(responseDto);
         }
+
+        allTodoList.sort(Collections.reverseOrder());
         return allTodoList;
     }
 
@@ -58,10 +60,10 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         String ps = requestDto.getPassword();
         TodoResponseDto responseDto = new TodoResponseDto();
 
-        List<Todo> todoList = check(userId, ps);
+        check(userId, ps);
+        List<Todo> todoList = getTodoList(userId);
 
-        //password 일치하므로 그 user 의 일정 중에서 todoId 로 찾은 게시글 수정
-
+        // todoId 로 찾은 게시글 수정
         for (Todo todo : todoList) {
             if (todo.getTodoId().equals(todoId)) {
                 Todo modifiedTodo = new Todo(requestDto);
@@ -77,9 +79,10 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         Long userId = requestDto.getUserId();
         String ps = requestDto.getPassword();
 
-        List<Todo> todoList = check(userId, ps);
+        check(userId, ps);
+        List<Todo> todoList = getTodoList(userId);
 
-        for(Todo todo : todoList ){
+        for (Todo todo : todoList) {
             if (!todo.getTodoId().equals(todoId)) {
                 throw new NoSuchElementException("등록되지 않은 일정입니다.");
             }
@@ -90,37 +93,24 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
     }
 
     //등록된 userId 인지, 그 userId 에 맞는 password 인지, userId 에 등록된 일정이 있는지, 확인하는 메서드 (예정)
-    private List<Todo> check(Long userId, String password) {
+    private void check(Long userId, String password) {
 
-         User user = userRepository.findById(userId).orElseThrow(()->
-            new RuntimeException("해당 사용자를 찾을 수 없습니다.")
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new RuntimeException("해당 사용자를 찾을 수 없습니다.")
         );
 
         if (!user.getPassword().equals(password)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+    }
 
+    private List<Todo> getTodoList (Long userId){
         List<Todo> todoList = todoRepository.findAllByUserId(userId);
         if (todoList.isEmpty()) {
             throw new RuntimeException("등록된 일정이 없습니다.");
         }
         return todoList;
     }
-
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalException(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
-    }
-
-    @ExceptionHandler(value = NoSuchElementException.class)
-    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
 }
+
 
