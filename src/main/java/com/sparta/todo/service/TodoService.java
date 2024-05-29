@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.*;
@@ -42,31 +43,47 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
                 .map(TodoResponseDto::new).toList();
     }
 
-    //등록된 일정 선택 수정 //확인할 것: ResponseDto 로 돌려줄 때, 시간이 바뀌는건 아닌지
+    //등록된 일정 선택 수정
+    @Transactional
     public TodoResponseDto modifyTodo(Long todoId, CreateTodoRequestDto requestDto) {
         Long userId = requestDto.getUserId();
         String ps = requestDto.getPassword();
         check(userId, ps);
 
-        return todoRepository.update(todoId, requestDto);
+        if (!todo.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("해당 일정에 대한 수정 권한이 없습니다.");
+        }
+
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new NoSuchElementException("해당 일정을 찾을 수 없습니다")
+                );
+
+        //수정
+        todo.modify(requestDto);
+
+        return new TodoResponseDto(todo);
     }
 
-    //user 본인인 등록했던 일정 선택 삭제
+    //user 본인이 등록했던 일정 선택 삭제
     public ResponseEntity deleteTodo(Long todoId, TodoRequestDto requestDto) {
         Long userId = requestDto.getUserId();
         String ps = requestDto.getPassword();
-
         check(userId, ps);
-        List<Todo> todoList = getTodoList(userId);
 
-        for (Todo todo : todoList) {
-            if (!todo.getTodoId().equals(todoId)) {
-                throw new NoSuchElementException("등록되지 않은 일정입니다.");
-            }
-            //삭제
-            todoRepository.deleteById(todoId);
-        }
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() ->new NoSuchElementException("해당 일정을 찾을 수 없습니다")
+                );
+        //삭제
+        todoRepository.deleteById(todoId);
         return ResponseEntity.noContent().build();
+    }
+
+    private List<Todo> getTodoList(Long userId) {
+        List<Todo> todoList = todoRepository.findAllByUserId(userId);
+        if (todoList.isEmpty()) {
+            throw new RuntimeException("등록된 일정이 없습니다.");
+        }
+        return todoList;
     }
 
     //등록된 userId 인지, 그 userId 에 맞는 password 인지, userId 에 등록된 일정이 있는지, 확인하는 메서드
@@ -79,14 +96,6 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         if (!user.getPassword().equals(password)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-    }
-
-    private List<Todo> getTodoList (Long userId){
-        List<Todo> todoList = todoRepository.findAllByUserId(userId);
-        if (todoList.isEmpty()) {
-            throw new RuntimeException("등록된 일정이 없습니다.");
-        }
-        return todoList;
     }
 }
 

@@ -16,5 +16,4 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 
     List<Todo> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
-    TodoResponseDto update(Long todoId, CreateTodoRequestDto requestDto);
 }
