@@ -15,14 +15,19 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
     @Column(nullable = false)
     private String nickName;
-    @Column(nullable = false)
+
+    @Column(nullable = false, unique = true)
     private String userName;
+
     @Enumerated(EnumType.STRING)
     private UserRoleType roleType;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false)
     private String authority;
 

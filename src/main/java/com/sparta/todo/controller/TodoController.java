@@ -6,6 +6,8 @@ import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.entity.Todo;
 import com.sparta.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,8 +45,9 @@ public class TodoController {
 
         //등록된 일정 선택 삭제
         @DeleteMapping("/{todoId}")
-        public void deleteTodo(@PathVariable Long todoId, @RequestBody TodoRequestDto requestDto) {
+        public ResponseEntity<Void> deleteTodo(@PathVariable Long todoId, @RequestBody TodoRequestDto requestDto) {
                 todoService.deleteTodo(todoId, requestDto);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
 

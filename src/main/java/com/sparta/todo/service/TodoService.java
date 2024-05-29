@@ -8,8 +8,10 @@ import com.sparta.todo.entity.User;
 import com.sparta.todo.repository.TodoRepository;
 import com.sparta.todo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,13 +93,12 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
     //등록된 userId 인지, 그 userId 에 맞는 password 인지, userId 에 등록된 일정이 있는지, 확인하는 메서드 (예정)
     private List<Todo> check(Long userId, String password) {
 
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new RuntimeException("해당 사용자를 찾을 수 없습니다.");
-        }
+         User user = userRepository.findById(userId).orElseThrow(()->
+            new RuntimeException("해당 사용자를 찾을 수 없습니다.")
+        );
 
-        if (!user.get().getPassword().equals(password)) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        if (!user.getPassword().equals(password)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
         List<Todo> todoList = todoRepository.findAllByUserId(userId);
@@ -106,5 +107,16 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         }
         return todoList;
     }
+
+    @ExceptionHandler(value = RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
+        return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalException(IllegalArgumentException e) {
+        return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+    }
+
 }
 
