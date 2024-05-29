@@ -36,42 +36,19 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         return new TodoResponseDto(todo);
     }
 
-    //등록된 일정 전체 조회 //내림차순 정렬 추가 필요
+    //등록된 일정 전체 조회
     public List<TodoResponseDto> getTodoList(Long userId, TodoRequestDto requestDto) {
-        String ps = requestDto.getPassword();
-        List<TodoResponseDto> allTodoList = new ArrayList<>();
-
-        check(userId, ps);
-        List<Todo> todoList = getTodoList(userId);
-        todoList.sort(Collections.reverseOrder());
-
-        for (Todo todo : todoList) {
-            TodoResponseDto responseDto = new TodoResponseDto(todo);
-            allTodoList.add(responseDto);
-        }
-
-        allTodoList.sort(Collections.reverseOrder());
-        return allTodoList;
+        return todoRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(TodoResponseDto::new).toList();
     }
 
     //등록된 일정 선택 수정 //확인할 것: ResponseDto 로 돌려줄 때, 시간이 바뀌는건 아닌지
     public TodoResponseDto modifyTodo(Long todoId, CreateTodoRequestDto requestDto) {
         Long userId = requestDto.getUserId();
         String ps = requestDto.getPassword();
-        TodoResponseDto responseDto = new TodoResponseDto();
-
         check(userId, ps);
-        List<Todo> todoList = getTodoList(userId);
 
-        // todoId 로 찾은 게시글 수정
-        for (Todo todo : todoList) {
-            if (todo.getTodoId().equals(todoId)) {
-                Todo modifiedTodo = new Todo(requestDto);
-
-                responseDto = new TodoResponseDto(modifiedTodo);
-            }
-        }
-        return responseDto;
+        return todoRepository.update(todoId, requestDto);
     }
 
     //user 본인인 등록했던 일정 선택 삭제
@@ -92,7 +69,7 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         return ResponseEntity.noContent().build();
     }
 
-    //등록된 userId 인지, 그 userId 에 맞는 password 인지, userId 에 등록된 일정이 있는지, 확인하는 메서드 (예정)
+    //등록된 userId 인지, 그 userId 에 맞는 password 인지, userId 에 등록된 일정이 있는지, 확인하는 메서드
     private void check(Long userId, String password) {
 
         User user = userRepository.findById(userId).orElseThrow(() ->
