@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -73,7 +72,7 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         return responseDto;
     }
 
-    //user 본인인 등록했던 일정 선택 삭제 //HTTP 상태코드 전송 필요
+    //user 본인인 등록했던 일정 선택 삭제
     public ResponseEntity deleteTodo(Long todoId, TodoRequestDto requestDto) {
         Long userId = requestDto.getUserId();
         String ps = requestDto.getPassword();
@@ -110,12 +109,17 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
 
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalException(IllegalArgumentException e) {
-        return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(value = NoSuchElementException.class)
+    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 }
