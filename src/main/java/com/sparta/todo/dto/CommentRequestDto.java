@@ -2,6 +2,7 @@ package com.sparta.todo.dto;
 
 import jakarta.persistence.Column;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,9 +11,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CommentRequestDto {
 
-    @NotEmpty
+    @NotBlank
     private Long commentId;
-    @NotEmpty(message = "등록할 내용이 없습니다.")
+    @NotBlank(message = "내용을 입력해주세요.")
     private String commentContent;
     private Long userId;
 

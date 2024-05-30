@@ -69,6 +69,7 @@ public class TodoService {
     }
 
     //user 본인이 등록했던 일정 선택 삭제
+    @Transactional
     public ResponseEntity deleteTodo(Long todoId, TodoRequestDto requestDto) {
         Long userId = requestDto.getUserId();
         String ps = requestDto.getPassword();

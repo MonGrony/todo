@@ -4,6 +4,7 @@ import com.sparta.todo.dto.CreateTodoRequestDto;
 import com.sparta.todo.dto.TodoRequestDto;
 import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.service.TodoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class TodoController {
 
         //일정 등록
         @PostMapping("")
-        public TodoResponseDto createTodo(@RequestBody CreateTodoRequestDto requestDto) {
+        public TodoResponseDto createTodo(@RequestBody @Valid CreateTodoRequestDto requestDto) {
                 return todoService.createTodo(requestDto); //user 키를 todo 에서 컨트롤 불가 하므로 추가
         }
 
@@ -38,7 +39,7 @@ public class TodoController {
 
         //등록된 일정 선택 수정
         @PostMapping("/{todoId}")
-        public TodoResponseDto modifyTodo(@RequestParam Long todoId, @RequestBody CreateTodoRequestDto requestDto) {
+        public TodoResponseDto modifyTodo(@RequestParam Long todoId, @RequestBody @Valid CreateTodoRequestDto requestDto) {
                 return todoService.modifyTodo(todoId, requestDto);
         }
 

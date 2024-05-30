@@ -35,16 +35,16 @@ public class CommentService {
     @Transactional
     public CommentResponseDto modifyComment(Long todoId, CommentRequestDto requestDto) {
 
-        //todoId 로 존재하는 todo인지 확인
         Todo todo = existCheckedTodo(todoId);
         Comment checkedComment = checkeSame(todo, requestDto);
         checkedComment.modify(requestDto);
         return new CommentResponseDto(checkedComment);
     }
 
-    //선택한 일정의 댓글 삭제 //성공 메시지와 상태 코드 반환 //일정과 댓글 모두 DB에 저장되어 있어야
-    //예외처리 : 일정이나 댓글의 ID 를 입력받지 않은 경우, 일정이나 댓글이 DB에 저장되어 있지 않은 경우, 선택한 댓글의 사용자가 현재 사용자와 일치하지 않은 경우
+    //선택한 일정의 댓글 삭제 //일정과 댓글 모두 DB에 저장되어 있어야
+    //예외처리 : 일정id 를 입력받지 않은 경우, 일정이나 댓글이 DB에 저장되어 있지 않은 경우, 선택한 댓글의 사용자가 현재 사용자와 일치하지 않은 경우
 
+    @Transactional
     public ResponseEntity deleteComment(Long todoId, CommentRequestDto requestDto) {
 
         Todo todo = existCheckedTodo(todoId);

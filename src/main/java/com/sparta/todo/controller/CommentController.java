@@ -20,15 +20,14 @@ public class CommentController {
     private final CommentService commentService;
 
     //댓글 등록
-
     @PostMapping("/comment")
-    public CommentResponseDto createComment(@PathVariable Long todoId, @Valid @RequestBody CommentRequestDto requestDto) {
+    public CommentResponseDto createComment(@PathVariable Long todoId, @RequestBody @Valid CommentRequestDto requestDto) {
         return commentService.createComment(todoId, requestDto);
     }
 
     //선택한 일정의 댓글 수정
     @PostMapping("")
-    public CommentResponseDto modifyComment(@PathVariable Long todoId, @Valid @RequestBody CommentRequestDto requestDto) {
+    public CommentResponseDto modifyComment(@PathVariable Long todoId, @RequestBody @Valid CommentRequestDto requestDto) {
         return commentService.modifyComment(todoId, requestDto);
     }
 
