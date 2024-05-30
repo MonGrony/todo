@@ -37,9 +37,8 @@ public class Todo extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; //user 를 참조하지만 key 의 주인은 user 다 (Table column 에 user_id 열이 생김)
 
-    @OneToMany
-    @JoinColumn(name="todoId")
-    private List<Comment> commentList = new ArrayList<>();
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> commentList;
 
     public Todo(CreateTodoRequestDto requestDto) {
         this.title = requestDto.getTitle();

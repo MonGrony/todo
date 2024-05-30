@@ -33,9 +33,9 @@ public class User {
     @Column(nullable = false)
     private String authority;
 
-    @OneToMany(mappedBy = "user_id", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> commentList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> commentList;
 
-    @OneToMany(mappedBy = "user_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Todo> todoList = new ArrayList<>();
 }

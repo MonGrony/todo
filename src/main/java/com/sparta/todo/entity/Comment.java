@@ -26,6 +26,11 @@ public class Comment extends Timestamped{
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name ="todo_id", nullable = false)
+    private Todo todo;
+
+
     public Comment(CommentRequestDto requestDto) {
         this.commentId = requestDto.getCommentId();
         this.commentContent = requestDto.getCommentContent();
@@ -33,5 +38,9 @@ public class Comment extends Timestamped{
 
     public void modify(CommentRequestDto requestDto) {
         this.commentContent = requestDto.getCommentContent();
+    }
+
+    public Long getTodoId() {
+        return this.todo.getTodoId();
     }
 }
