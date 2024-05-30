@@ -5,8 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 @Table(name = "user")
@@ -31,4 +33,9 @@ public class User {
     @Column(nullable = false)
     private String authority;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Todo> todoList = new ArrayList<>();
 }

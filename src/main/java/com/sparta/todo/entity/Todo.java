@@ -1,16 +1,13 @@
 package com.sparta.todo.entity;
 
 import com.sparta.todo.dto.CreateTodoRequestDto;
-import com.sparta.todo.dto.TodoRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
 @Table(name = "todo")
 @Entity
@@ -20,6 +17,9 @@ public class Todo extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long todoId;
+
+//    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)//
+//    private Long userId; //user_id로 인식
 
     @Column(nullable = false)
     private String title;
@@ -33,11 +33,9 @@ public class Todo extends Timestamped {
     @Column(nullable = false)
     private String password;
 
-    private Long userId;
-
-    @OneToMany
-    @JoinColumn(name = "Todo_id")
-    private List<Comment> commentList = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user; //user 를 참조하지만 key 의 주인은 user 다 (Table column 에 user_id 열이 생김)
 
     public Todo(CreateTodoRequestDto requestDto) {
         this.title = requestDto.getTitle();
@@ -50,6 +48,14 @@ public class Todo extends Timestamped {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
         this.manager = requestDto.getManager();
+    }
+
+    public Todo(CreateTodoRequestDto requestDto, User user) {
+        this.title = requestDto.getTitle();
+        this.user = user;
+        this.content = requestDto.getContent();
+        this.manager = requestDto.getManager();
+        this.password = requestDto.getPassword();
     }
 
 }

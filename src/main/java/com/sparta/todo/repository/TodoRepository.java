@@ -1,19 +1,20 @@
 package com.sparta.todo.repository;
 
-import com.sparta.todo.dto.CreateTodoRequestDto;
-import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.entity.Todo;
+import com.sparta.todo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface TodoRepository extends JpaRepository<Todo, Long> {
-    Optional<Todo> findByUserIdAndTodoId(Long userId, Long todoId);
+    Optional<Todo> findByUserAndTodoId(User user, Long todoId);
 
-    List<Todo> findAllByUserId(Long userId);
+//    Optional<Todo> findByTodoIdAndUserId(Long todoId, Long userId);
+//
+//    List<Todo> findAllByUser(User user);
+//
+//    List<Todo> findAllByUserIdOrderByCreatedAtDesc(Long userId); //실행시점에 시행됨
 
-    List<Todo> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 
 }

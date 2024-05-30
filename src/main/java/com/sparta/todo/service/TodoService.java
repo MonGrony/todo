@@ -7,52 +7,58 @@ import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
 import com.sparta.todo.repository.TodoRepository;
 import com.sparta.todo.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.*;
 
 @RequiredArgsConstructor
 @Service
-public class TodoService { //HTTP 상태코드 전송 설정 필요
+public class TodoService {
 
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
 
     //일정 등록
     public TodoResponseDto createTodo(CreateTodoRequestDto requestDto) {
-        Todo todo = todoRepository.save(new Todo(requestDto));
-        return new TodoResponseDto(todo);
+        User user = userRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException(""));
+        Todo todo = new Todo(requestDto, user);
+        Todo savedTodo = todoRepository.save(todo);
+        return new TodoResponseDto(savedTodo);
     }
 
     //등록된 일정 선택 조회
     public TodoResponseDto getTodo(Long userId, Long todoId) {
-        Todo todo = todoRepository.findByUserIdAndTodoId(userId, todoId)
-                .orElseThrow(() -> new RuntimeException("해당 일정을 찾을 수 없습니다.")
-                );
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(""));
+
+        Todo todo = todoRepository.findByUserAndTodoId(user, todoId)
+                .orElseThrow(() -> new EntityNotFoundException(""));
         return new TodoResponseDto(todo);
     }
 
     //등록된 일정 전체 조회
     public List<TodoResponseDto> getTodoList(Long userId, TodoRequestDto requestDto) {
-        return todoRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
+        User user1 = userRepository.findById(userId).orElseThrow(() -> new RuntimeException());
+        return todoRepository.findAll().stream()
                 .map(TodoResponseDto::new).toList();
     }
 
     //등록된 일정 선택 수정
     @Transactional
     public TodoResponseDto modifyTodo(Long todoId, CreateTodoRequestDto requestDto) {
+//        String username = requestDto.getUser().getUserName();
         Long userId = requestDto.getUserId();
-        String ps = requestDto.getPassword();
+        String ps = requestDto.getPassword();//
         check(userId, ps);
 
-        if (!todo.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("해당 일정에 대한 수정 권한이 없습니다.");
-        }
+//        if (!todo.getUserId().equals(userId)) {
+//            throw new IllegalArgumentException("해당 일정에 대한 수정 권한이 없습니다.");
+//        }
 
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new NoSuchElementException("해당 일정을 찾을 수 없습니다")
@@ -71,7 +77,7 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
         check(userId, ps);
 
         Todo todo = todoRepository.findById(todoId)
-                .orElseThrow(() ->new NoSuchElementException("해당 일정을 찾을 수 없습니다")
+                .orElseThrow(() -> new NoSuchElementException("해당 일정을 찾을 수 없습니다")
                 );
         //삭제
         todoRepository.deleteById(todoId);
@@ -79,7 +85,8 @@ public class TodoService { //HTTP 상태코드 전송 설정 필요
     }
 
     private List<Todo> getTodoList(Long userId) {
-        List<Todo> todoList = todoRepository.findAllByUserId(userId);
+        User user1 = userRepository.findById(userId).orElseThrow(() -> new RuntimeException());
+        List<Todo> todoList = todoRepository.findAll();
         if (todoList.isEmpty()) {
             throw new RuntimeException("등록된 일정이 없습니다.");
         }
