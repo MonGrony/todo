@@ -21,7 +21,6 @@ public class CommentController {
     }
 
     //선택한 일정의 댓글 수정
-
     @PostMapping("")
     public CommentResponseDto modifyComment(@PathVariable Long todoId, @RequestBody CommentRequestDto requestDto) {
         return commentService.modifyComment(todoId, requestDto);

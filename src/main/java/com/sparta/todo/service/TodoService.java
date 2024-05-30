@@ -51,7 +51,6 @@ public class TodoService {
     //등록된 일정 선택 수정
     @Transactional
     public TodoResponseDto modifyTodo(Long todoId, CreateTodoRequestDto requestDto) {
-//        String username = requestDto.getUser().getUserName();
         Long userId = requestDto.getUserId();
         String ps = requestDto.getPassword();//
         check(userId, ps);
@@ -64,7 +63,6 @@ public class TodoService {
                 .orElseThrow(() -> new NoSuchElementException("해당 일정을 찾을 수 없습니다")
                 );
 
-        //수정
         todo.modify(requestDto);
 
         return new TodoResponseDto(todo);
