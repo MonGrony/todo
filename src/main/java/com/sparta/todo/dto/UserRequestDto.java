@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 public class UserRequestDto {
 
     private Long userId;
-    private String nickName;
+    private String nickname;//빈칸 허용!
     @NotBlank
-    private String userName;
+    private String username;
     private UserRoleType roleType;
     @NotBlank
     private String password;
