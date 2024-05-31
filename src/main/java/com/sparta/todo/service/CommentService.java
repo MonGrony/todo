@@ -24,6 +24,7 @@ public class CommentService {
     private final TodoRepository todoRepository;
     private final CommentRepository commentRepository;
 
+
     //댓글 등록 //예외처리: 일정이 DB에 저장되지 않은 경우
     public CommentResponseDto createComment(Long todoId, CommentRequestDto requestDto) {
 
@@ -37,7 +38,7 @@ public class CommentService {
     public CommentResponseDto modifyComment(Long todoId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Todo todo = existCheckedTodo(todoId);
-        Comment checkedComment = checkeSame(todo, requestDto, userDetails);
+        Comment checkedComment = checkSame(todo, requestDto, userDetails);
         checkedComment.modify(requestDto);
         return new CommentResponseDto(checkedComment);
     }
@@ -49,7 +50,7 @@ public class CommentService {
     public ResponseEntity deleteComment(Long todoId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Todo todo = existCheckedTodo(todoId);
-        Comment checkedComment = checkeSame(todo, requestDto, userDetails);
+        Comment checkedComment = checkSame(todo, requestDto, userDetails);
         commentRepository.delete(checkedComment);
 
         return ResponseEntity.ok().build();
@@ -62,7 +63,7 @@ public class CommentService {
         return todo;
     }
 
-    public Comment checkeSame(Todo todo, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
+    public Comment checkSame(Todo todo, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         //확인된 todo의 댓글 List로 모음
         List<Comment> commentList = commentRepository.findByTodo(todo);

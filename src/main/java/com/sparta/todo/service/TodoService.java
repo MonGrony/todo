@@ -23,6 +23,7 @@ public class TodoService {
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
 
+
     //일정 등록
     public TodoResponseDto createTodo(CreateTodoRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
@@ -43,13 +44,18 @@ public class TodoService {
     }
 
     //등록된 일정 전체 조회
-    public List<TodoResponseDto> getTodoList(Long userId, TodoRequestDto requestDto) {
+    public List<TodoResponseDto> getTodoList(Long userId) {
 
-        getTodoList(userId);
+        User user = userRepository.findByUserId(userId);
+        List todolist = todoRepository.findAllByUserOrderByCreatedAtDesc(user)
+                .stream().map(TodoResponseDto::new).toList();
 
-        List<Todo> todoList = todoRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
-        return todoList.stream().map(TodoResponseDto::new).toList();
+        if (todolist.isEmpty()) {
+            throw new RuntimeException("등록된 일정이 없습니다.");
+        }
+        return todolist;
     }
+
 
     //등록된 일정 선택 수정
     @Transactional
@@ -82,14 +88,7 @@ public class TodoService {
     }
 
     //userId 에 등록된 일정이 있는지 확인하는 메서드
-    private List<Todo> getTodoList(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException(""));
-        List<Todo> todoList = todoRepository.findAll();
-        if (todoList.isEmpty()) {
-            throw new RuntimeException("등록된 일정이 없습니다.");
-        }
-        return todoList;
-    }
+
 
     //등록된 userId 인지, 그 userId 에 맞는 password 인지 확인하는 메서드
     private void check(Long userId, String password) {
@@ -104,5 +103,6 @@ public class TodoService {
     }
 
 }
+
 
 

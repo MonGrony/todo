@@ -36,9 +36,9 @@ public class TodoController {
 
         //등록된 일전 전체 조회
         @GetMapping("") //todoId 만 가능
-        public List<TodoResponseDto> getTodoList(@RequestBody TodoRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        public List<TodoResponseDto> getTodoList(@AuthenticationPrincipal UserDetailsImpl userDetails) {
                 Long userId = userDetails.getUser().getUserId();
-                return todoService.getTodoList(userId, requestDto);
+                return todoService.getTodoList(userId);
         }
 
         //등록된 일정 선택 수정
