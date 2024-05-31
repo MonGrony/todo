@@ -7,6 +7,7 @@ import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
 import com.sparta.todo.repository.CommentRepository;
 import com.sparta.todo.repository.TodoRepository;
+import com.sparta.todo.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,10 @@ public class CommentService {
 
     //등록한 댓글 수정 //예외처리: 내용 이외의 것들 수정하려 시도할 때(내용만 수정 가능),
     @Transactional
-    public CommentResponseDto modifyComment(Long todoId, CommentRequestDto requestDto) {
+    public CommentResponseDto modifyComment(Long todoId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Todo todo = existCheckedTodo(todoId);
-        Comment checkedComment = checkeSame(todo, requestDto);
+        Comment checkedComment = checkeSame(todo, requestDto, userDetails);
         checkedComment.modify(requestDto);
         return new CommentResponseDto(checkedComment);
     }
@@ -45,10 +46,10 @@ public class CommentService {
     //예외처리 : 일정id 를 입력받지 않은 경우, 일정이나 댓글이 DB에 저장되어 있지 않은 경우, 선택한 댓글의 사용자가 현재 사용자와 일치하지 않은 경우
 
     @Transactional
-    public ResponseEntity deleteComment(Long todoId, CommentRequestDto requestDto) {
+    public ResponseEntity deleteComment(Long todoId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         Todo todo = existCheckedTodo(todoId);
-        Comment checkedComment = checkeSame(todo, requestDto);
+        Comment checkedComment = checkeSame(todo, requestDto, userDetails);
         commentRepository.delete(checkedComment);
 
         return ResponseEntity.ok().build();
@@ -61,7 +62,7 @@ public class CommentService {
         return todo;
     }
 
-    public Comment checkeSame(Todo todo, CommentRequestDto requestDto) {
+    public Comment checkeSame(Todo todo, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
 
         //확인된 todo의 댓글 List로 모음
         List<Comment> commentList = commentRepository.findByTodo(todo);
@@ -73,7 +74,7 @@ public class CommentService {
 
         //comment 작성자 일치하는지 확인
         Long commentedUserId = checkedComment.getUser().getUserId();
-        Long changerUserId = requestDto.getUserId();
+        Long changerUserId = userDetails.getUser().getUserId();
         if (!commentedUserId.equals(changerUserId)) {
             throw new IllegalArgumentException("댓글 작성자 본인만 수정/삭제가 가능합니다.");
         }

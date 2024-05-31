@@ -14,7 +14,7 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 //
 //    List<Todo> findAllByUser(User user);
 //
-//    List<Todo> findAllByUserIdOrderByCreatedAtDesc(Long userId); //실행시점에 시행됨
+    List<Todo> findAllByUserIdOrderByCreatedAtDesc(Long userId); //실행시점에 시행됨
 
 
 }
