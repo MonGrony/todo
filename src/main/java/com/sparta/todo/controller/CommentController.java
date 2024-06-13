@@ -28,14 +28,16 @@ public class CommentController {
     }
 
     //선택한 일정의 댓글 수정
-    @PostMapping("")
-    public CommentResponseDto modifyComment(@PathVariable Long todoId, @RequestBody @Valid CommentRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @PostMapping("/{commentId}")
+    public CommentResponseDto modifyComment(@PathVariable Long todoId, @RequestBody @Valid CommentRequestDto requestDto,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return commentService.modifyComment(todoId, requestDto, userDetails);
     }
 
     //선택한 일정의 댓글 삭제
     @DeleteMapping("/{commentId}")
-    public ResponseEntity deleteComment(@PathVariable Long todoId,  @RequestBody CommentRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity deleteComment(@PathVariable Long todoId,  @RequestBody CommentRequestDto requestDto,
+                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         commentService.deleteComment(todoId, requestDto, userDetails);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 

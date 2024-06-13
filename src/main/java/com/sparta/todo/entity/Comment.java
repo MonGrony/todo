@@ -1,7 +1,6 @@
 package com.sparta.todo.entity;
 
 import com.sparta.todo.dto.CommentRequestDto;
-import com.sparta.todo.dto.CreateTodoRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name="comment")
 @NoArgsConstructor
-public class Comment extends Timestamped{
+public class Comment extends Timestamped{ //BaseEntity?
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,9 +17,6 @@ public class Comment extends Timestamped{
 
     @Column(nullable = false)
     private String commentContent;
-
-//    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
-//    private Long userId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)

@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,16 +24,17 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    public static final String BEARER_PREFIX = "bearer ";
+    public static final String BEARER_PREFIX = "Bearer "; //규칙(약속)
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String AUTHRORIZATION_KEY = "auth";
-    private final long TOKEN_TIME = 60 * 60 * 1000L;
+    public static final String AUTHRORIZATION_KEY = "auth"; //권한을 가져오기 위한
+    private final long TOKEN_TIME = 60 * 60 * 1000L; //ms 단위
 
     @Value("${jwt.secret.key}")
-    private String secretKey;
+    private String secretKey; //Encode 한 것
     private Key key;
-    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.ES256;
-    public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
+    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그"); //상태나 동작에 대한 정보를 시간순으로 기록
+    //@Slf4j 를 클래스 위에 달아주는 방법도 있음
 
     @PostConstruct
     public void init() {
@@ -42,7 +44,6 @@ public class JwtUtil {
 
     //토큰 생성
     public String createToken(String userName, UserRoleType role) {
-
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -102,6 +103,7 @@ public class JwtUtil {
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
+
 
     public String getTokenFromRequest(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();

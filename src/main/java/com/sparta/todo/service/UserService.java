@@ -13,18 +13,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-    }
 
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
 
@@ -50,19 +45,19 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void login(LoginRequestDto requestDto, HttpServletResponse response) {
-        String username = requestDto.getUsername();
-        String password = requestDto.getPassword();
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new IllegalArgumentException("등록된 사용자가 아닙니다.")
-        );
-
-        if (!passwordEncoder.matches((password), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
-        String token = jwtUtil.createToken(user.getUsername(), user.getRoleType());
-        jwtUtil.addJwtToCookie(token, response);
-    }
+//    public void login(LoginRequestDto requestDto, HttpServletResponse response) {
+//        String username = requestDto.getUsername();
+//        String password = requestDto.getPassword();
+//
+//        User user = userRepository.findByUsername(username).orElseThrow(
+//                () -> new IllegalArgumentException("등록된 사용자가 아닙니다.")
+//        );
+//
+//        if (!passwordEncoder.matches((password), user.getPassword())) {
+//            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+//        }
+//
+//        String token = jwtUtil.createToken(user.getUsername(), user.getRoleType());
+//        jwtUtil.addJwtToCookie(token, response);
+//    } //filter 로그인 이라 필요없음
 }

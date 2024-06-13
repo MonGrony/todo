@@ -29,7 +29,8 @@ public class TodoController {
 
         //등록된 일정 선택 조회
         @GetMapping("/{todoId}")
-        public TodoResponseDto getTodo(@PathVariable Long todoId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        public TodoResponseDto getTodo(@PathVariable Long todoId,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
                 Long userId = userDetails.getUser().getUserId();
                 return todoService.getTodo(userId, todoId);
         }
@@ -43,13 +44,15 @@ public class TodoController {
 
         //등록된 일정 선택 수정
         @PostMapping("/{todoId}")
-        public TodoResponseDto modifyTodo(@RequestParam Long todoId, @RequestBody @Valid CreateTodoRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        public TodoResponseDto modifyTodo(@RequestParam Long todoId, @RequestBody @Valid CreateTodoRequestDto requestDto,
+                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
                 return todoService.modifyTodo(todoId, userDetails, requestDto);
         }
 
         //등록된 일정 선택 삭제
         @DeleteMapping("/{todoId}")
-        public ResponseEntity<Void> deleteTodo(@PathVariable Long todoId, @RequestBody TodoRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        public ResponseEntity<Void> deleteTodo(@PathVariable Long todoId, @RequestBody TodoRequestDto requestDto,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
                 todoService.deleteTodo(todoId, userDetails);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
