@@ -1,7 +1,6 @@
 package com.sparta.todo.service;
 
 import com.sparta.todo.dto.CreateTodoRequestDto;
-import com.sparta.todo.dto.TodoRequestDto;
 import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
@@ -11,10 +10,12 @@ import com.sparta.todo.security.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Service
@@ -22,12 +23,13 @@ public class TodoService {
 
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     //일정 등록
     public TodoResponseDto createTodo(CreateTodoRequestDto requestDto) {
-        User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException(""));
+        Long userId = requestDto.getUserId();
+        User user = findUser(userId);
         Todo todo = new Todo(requestDto, user);
         Todo savedTodo = todoRepository.save(todo);
         return new TodoResponseDto(savedTodo);
@@ -35,9 +37,7 @@ public class TodoService {
 
     //등록된 일정 선택 조회
     public TodoResponseDto getTodo(Long userId, Long todoId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(""));
-
+        User user = findUser(userId);
         Todo todo = todoRepository.findByUserAndTodoId(user, todoId)
                 .orElseThrow(() -> new EntityNotFoundException(""));
         return new TodoResponseDto(todo);
@@ -97,9 +97,20 @@ public class TodoService {
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다.")
         );
 
-        if (!user.getPassword().equals(password)) {
+//        if (!user.getPassword().equals(password)) {
+//            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+//        }
+
+        // >> 비밀번호 일치 확인
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+    }
+
+    private User findUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(""));
+        return user;
     }
 
 }
