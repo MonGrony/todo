@@ -22,6 +22,14 @@ repositories {
 }
 
 dependencies {
+
+	// build.gradle //테스트를 위한 JUnit5
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	test {
+		useJUnitPlatform()
+	}
+
 	// JPA 구현체인 hibernate
 	implementation 'org.hibernate:hibernate-core:6.1.7.Final'
 	//JPA
