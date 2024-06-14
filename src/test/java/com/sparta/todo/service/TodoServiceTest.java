@@ -7,6 +7,7 @@ import com.sparta.todo.entity.User;
 import com.sparta.todo.repository.TodoRepository;
 import com.sparta.todo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,12 +35,20 @@ class TodoServiceTest {
     UserRepository userRepository;
     @Mock
     PasswordEncoder passwordEncoder;
+    @Mock
+    TodoService todoService;
+
+    @BeforeEach
+    public void setUp(){
+        //작동시키려면 Service 클래스가 필요하므로 생성자 Service 초기화
+        todoService = new TodoService(todoRepository, userRepository, passwordEncoder);
+    }
 
     // createTodo 메서드 작동 후
     // 등록한 내용과 repository 에 등록된 것과 동일한 내용인지 확인
     @Test
     @DisplayName("Todo 등록 후 반영")
-    public void test(){
+    public void enrollTodo(){
         //given
         CreateTodoRequestDto requestDto = CreateTodoRequestDto.builder()
         .title("제목입니다")
@@ -48,9 +57,6 @@ class TodoServiceTest {
         .manager("관리자입니다")
         .password("비밀번호123%")
         .build();
-
-        //작동시키려면 Service 클래스가 필요하므로 생성자 Service 초기화
-        TodoService todoService = new TodoService(todoRepository, userRepository, passwordEncoder);
 
         //repository 를 통해 requestDto 내용을 DB에 저장해야만 responseDto 로 꺼낼 수 있으므로 repository.save 를 사용해야 함
         // save 에는 Entity 가 필요하므로 user 찾아야 함 -> user 설정해줌
@@ -85,8 +91,8 @@ class TodoServiceTest {
     //일정 선택 조회 시 한 user 가진 to-do 에 없는 to-doId를 입력한 경우 exception 발생
     @Test
     @DisplayName("getTodo 예외 처리")
-    public void test2(){
-        TodoService todoService = new TodoService(todoRepository, userRepository, passwordEncoder);
+    public void getTodoException(){
+
         //given
         Long userId = 123L;
         User user = Mockito.mock(User.class);
