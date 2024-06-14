@@ -82,5 +82,30 @@ class TodoServiceTest {
 
     }
 
+    //일정 선택 조회 시 한 user 가진 to-do 에 없는 to-doId를 입력한 경우 exception 발생
+    @Test
+    @DisplayName("getTodo 예외 처리")
+    public void test2(){
+        TodoService todoService = new TodoService(todoRepository, userRepository, passwordEncoder);
+        //given
+        Long userId = 123L;
+        User user = Mockito.mock(User.class);
+
+        //입력한 userId 값이 무엇인지와 상관 없이 user 를 return 한다 //다음 단계로 가야 하니까 무조건 통과해야함
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+
+        // when 등록되지 않은 todoId(3L)로 repository 에서 to-do 찾기 (getTodo)
+        when(todoRepository.findByUserAndTodoId(ArgumentMatchers.any(), anyLong()))
+                .thenThrow(new EntityNotFoundException("등록된 일정이 없습니다."));
+
+        //then //Exception 발생할 것이다
+        assertThrows(EntityNotFoundException.class, () -> {
+            todoService.getTodo(userId, 3L);
+        });
+    }
+
+    //등록된 일정 전체 조회시 여러 개가 Desc 로 나오는지, 없을 때 exception 발생 여부
+
 
 }
