@@ -2,13 +2,13 @@ package com.sparta.todo.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
+@Builder
 public class CreateTodoRequestDto {
-
-//    UserRequestDto userRequestDto;
 
     @NotBlank(message = "제목을 입력해주세요.")
     private String title;
@@ -23,6 +23,5 @@ public class CreateTodoRequestDto {
     //userid가 string 이었으니까 userIdentity
     //todo에 있던 userId 를 떼서 user 클래스에 넘겨줘야 하는 상황
 
-//    private UserRequestDto user;
 
 }

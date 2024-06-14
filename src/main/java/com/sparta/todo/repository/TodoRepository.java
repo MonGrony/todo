@@ -10,11 +10,12 @@ import java.util.Optional;
 public interface TodoRepository extends JpaRepository<Todo, Long> {
     Optional<Todo> findByUserAndTodoId(User user, Long todoId);
 
+    List<Todo> findAllByUserOrderByCreatedAtDesc(User user); //실행시점에 시행됨
+
 //    Optional<Todo> findByTodoIdAndUserId(Long todoId, Long userId);
 //
 //    List<Todo> findAllByUser(User user);
 //
-    List<Todo> findAllByUserOrderByCreatedAtDesc(User user); //실행시점에 시행됨
 
 
 }

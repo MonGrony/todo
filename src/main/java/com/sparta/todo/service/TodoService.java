@@ -39,7 +39,7 @@ public class TodoService {
     public TodoResponseDto getTodo(Long userId, Long todoId) {
         User user = findUser(userId);
         Todo todo = todoRepository.findByUserAndTodoId(user, todoId)
-                .orElseThrow(() -> new EntityNotFoundException(""));
+                .orElseThrow(() -> new EntityNotFoundException("등록된 일정이 없습니다."));
         return new TodoResponseDto(todo);
     }
 
@@ -97,9 +97,6 @@ public class TodoService {
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다.")
         );
 
-//        if (!user.getPassword().equals(password)) {
-//            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-//        }
 
         // >> 비밀번호 일치 확인
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -109,7 +106,7 @@ public class TodoService {
 
     private User findUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(""));
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다"));
         return user;
     }
 
