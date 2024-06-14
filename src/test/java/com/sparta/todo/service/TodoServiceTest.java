@@ -19,8 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -84,7 +83,8 @@ class TodoServiceTest {
         assertEquals(requestDto.getContent(),responseDto.getContent());
         assertEquals(requestDto.getManager(),responseDto.getManager());
 
-        //createdAt 은 시간차가 있으므로 비교보다는 생성됐는지 '확인'을 하면 됨
+        //createdAt 은 시간차가 있으므로 비교보다는 생성됐는지 '확인'
+        assertNotNull(responseDto.getCreatedAt());
 
     }
 
