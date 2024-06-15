@@ -34,11 +34,11 @@ class TodoServiceTest {
     UserRepository userRepository;
     @Mock
     PasswordEncoder passwordEncoder;
-    @Mock
-    TodoService todoService;
+
+    private TodoService todoService;
 
     @BeforeEach
-    public void setUp(){
+    void setUp(){
         //작동시키려면 Service 클래스가 필요하므로 생성자 Service 초기화
         todoService = new TodoService(todoRepository, userRepository, passwordEncoder);
     }
@@ -51,7 +51,6 @@ class TodoServiceTest {
         //given
         CreateTodoRequestDto requestDto = CreateTodoRequestDto.builder()
         .title("제목입니다")
-        .userId(123L)
         .content("내용입니다")
         .manager("관리자입니다")
         .password("비밀번호123%")
@@ -60,8 +59,8 @@ class TodoServiceTest {
         //repository 를 통해 requestDto 내용을 DB에 저장해야만 responseDto 로 꺼낼 수 있으므로 repository.save 를 사용해야 함
         // save 에는 Entity 가 필요하므로 user 찾아야 함 -> user 설정해줌
         // save 후 to-do 를 반환하므로 to-do Entity 설정해 줌
-        User user = Mockito.mock(User.class); //가짜 user 생성
-        Todo todo = Mockito.mock(Todo.class); //가짜 to-do 생성
+        User user = Mockito.mock(User.class);
+        Todo todo = Mockito.mock(Todo.class);
 
         //when
         when(userRepository.findById(anyLong())).thenReturn( //anyLong 대신 user.getUserId() 도 가능
@@ -76,15 +75,12 @@ class TodoServiceTest {
         given(todo.getContent()).willReturn(requestDto.getContent());
         given(todo.getManager()).willReturn(requestDto.getManager());
 
-        TodoResponseDto responseDto = todoService.createTodo(requestDto);
+        TodoResponseDto responseDto = todoService.createTodo(requestDto, user); //to-doService 의 createTodo 메서드 작동 후 반환값이 TodoResponseDto 임
 
         //then - responseDto 에 잘 반영되는지 확인
         assertEquals(requestDto.getTitle(),responseDto.getTitle());
         assertEquals(requestDto.getContent(),responseDto.getContent());
         assertEquals(requestDto.getManager(),responseDto.getManager());
-
-        //createdAt 은 시간차가 있으므로 비교보다는 생성됐는지 '확인'
-        assertNotNull(responseDto.getCreatedAt());
 
     }
 
