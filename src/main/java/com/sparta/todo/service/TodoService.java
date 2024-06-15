@@ -27,10 +27,10 @@ public class TodoService {
 
 
     //일정 등록
-    public TodoResponseDto createTodo(CreateTodoRequestDto requestDto) {
-        Long userId = requestDto.getUserId();
-        User user = findUser(userId);
-        Todo todo = new Todo(requestDto, user);
+    public TodoResponseDto createTodo(CreateTodoRequestDto requestDto, User user) {
+        Long userId = user.getUserId();
+        User finduser = findUser(userId);
+        Todo todo = new Todo(requestDto, finduser);
         Todo savedTodo = todoRepository.save(todo);
         return new TodoResponseDto(savedTodo);
     }
