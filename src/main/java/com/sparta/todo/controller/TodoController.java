@@ -32,7 +32,7 @@ public class TodoController {
 
     //등록된 일정 선택 조회
     @GetMapping("/{todoId}")
-    public TodoResponseDto getTodo(@PathVariable Long todoId,
+    public ResponseEntity<TodoResponseDto> getTodo(@PathVariable Long todoId,
                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         Long userId = userDetails.getUser().getUserId();
         return todoService.getTodo(userId, todoId);

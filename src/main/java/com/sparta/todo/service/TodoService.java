@@ -36,11 +36,12 @@ public class TodoService {
     }
 
     //등록된 일정 선택 조회
-    public TodoResponseDto getTodo(Long userId, Long todoId) {
+    public ResponseEntity<TodoResponseDto> getTodo(Long userId, Long todoId) {
         User user = findUser(userId);
         Todo todo = todoRepository.findByUserAndTodoId(user, todoId)
                 .orElseThrow(() -> new EntityNotFoundException("등록된 일정이 없습니다."));
-        return new TodoResponseDto(todo);
+        TodoResponseDto responseDto = new TodoResponseDto(todo);
+        return ResponseEntity.ok(responseDto);
     }
 
     //등록된 일정 전체 조회
