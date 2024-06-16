@@ -2,10 +2,11 @@ package com.sparta.todo.entity;
 
 import com.sparta.todo.dto.CreateTodoRequestDto;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -47,6 +48,15 @@ public class Todo extends Timestamped {
         this.password = requestDto.getPassword();
     }
 
+    public Todo(Long todoId, String title, String content, String manager, String password, User user) {
+        this.todoId=todoId;
+        this.title = title;
+        this.content = content;
+        this.manager = manager;
+        this.password = password;
+        this.user = user;
+    }
+
     public void modify(CreateTodoRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
@@ -60,5 +70,22 @@ public class Todo extends Timestamped {
         this.manager = requestDto.getManager();
         this.password = requestDto.getPassword();
     }
+
+    public Todo(Long todoId, String title, String content, String manager, String password) {
+        this.todoId = todoId;
+        this.title = title;
+        this.content = content;
+        this.manager = manager;
+        this.password = password;
+    }
+    public Todo(Long todoId, CreateTodoRequestDto requestDto) {
+        this.todoId = todoId;
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.manager = requestDto.getManager();
+        this.password = requestDto.getPassword();
+    }
+
+
 
 }
