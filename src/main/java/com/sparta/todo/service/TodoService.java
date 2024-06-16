@@ -1,6 +1,7 @@
 package com.sparta.todo.service;
 
 import com.sparta.todo.dto.CreateTodoRequestDto;
+import com.sparta.todo.dto.TodoRequestDto;
 import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
@@ -62,7 +63,9 @@ public class TodoService {
     @Transactional
     public TodoResponseDto modifyTodo(Long todoId, UserDetailsImpl userDetails, CreateTodoRequestDto requestDto) {
         Long userId = userDetails.getUser().getUserId();
-        check(userId, userDetails.getPassword());
+        String ps = userDetails.getUser().getPassword();
+        String forCheckPW = requestDto.getPassword();
+        check(userId,ps, forCheckPW);
 
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new NoSuchElementException("해당 일정을 찾을 수 없습니다")
@@ -74,15 +77,19 @@ public class TodoService {
     }
 
     //user 본인이 등록했던 일정 선택 삭제
+
     @Transactional
-    public ResponseEntity deleteTodo(Long todoId, UserDetailsImpl userDetails) {
+    public ResponseEntity deleteTodo(Long todoId, UserDetailsImpl userDetails, TodoRequestDto requestDto) {
         Long userId = userDetails.getUser().getUserId();
         String ps = userDetails.getUser().getPassword();
-        check(userId, ps);
+        Long forCheckUserId = requestDto.getUserId();
+        String forCheckPW = requestDto.getPassword();
+        check(userId, forCheckUserId, ps, forCheckPW);
 
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new NoSuchElementException("해당 일정을 찾을 수 없습니다")
                 );
+
         //삭제
         todoRepository.deleteById(todoId);
         return ResponseEntity.noContent().build();
@@ -90,17 +97,26 @@ public class TodoService {
 
     //userId 에 등록된 일정이 있는지 확인하는 메서드
 
-
-    //등록된 userId 인지, 그 userId 에 맞는 password 인지 확인하는 메서드
-    private void check(Long userId, String password) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다.")
-        );
-
+    private void check(Long userId, String password, String PW) {
+        if (!userId.equals(userId)) {
+            throw new RuntimeException("본인의 것만 수정 가능합니다");
+        }
 
         // >> 비밀번호 일치 확인
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches( password, PW)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    //등록된 userId 인지, 그 userId 에 맞는 password 인지 확인하는 메서드
+    private void check(Long userId, Long forCheckUserId, String password, String PW) {
+
+        if (!userId.equals(forCheckUserId)) {
+            throw new RuntimeException("본인의 것만 수정 가능합니다");
+        }
+
+        // >> 비밀번호 일치 확인
+        if (!passwordEncoder.matches( password, PW)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
     }

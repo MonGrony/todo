@@ -5,6 +5,7 @@ import com.sparta.todo.config.WebSecurityConfig;
 import com.sparta.todo.controller.CommentController;
 import com.sparta.todo.controller.TodoController;
 import com.sparta.todo.dto.CreateTodoRequestDto;
+import com.sparta.todo.dto.TodoRequestDto;
 import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
@@ -36,10 +37,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -101,7 +102,7 @@ public class TodoMvcTest {
 
     public List<Todo> makeMockTodoList(int count) {
         List<Todo> mockTodoList = new ArrayList<>();
-        User user = new User(1L,"nick이름", "name", UserRoleType.USER, "qlalfqjsgh12345");
+        User user = new User(1L, "nick이름", "name", UserRoleType.USER, "qlalfqjsgh12345");
         for (int i = 0; i < count; i++) {
             Long todoId = (long) (i + 1);
             String title = "Title " + (i + 1);
@@ -109,7 +110,7 @@ public class TodoMvcTest {
             String manager = "Manager " + (i + 1);
             String password = "Password " + (i + 1);
 //            LocalDateTime createdAt = LocalDateTime.now();
-            Todo todo = new Todo(todoId,title, content, manager, password, user);
+            Todo todo = new Todo(todoId, title, content, manager, password, user);
             mockTodoList.add(todo);
         }
         return mockTodoList;
@@ -154,7 +155,7 @@ public class TodoMvcTest {
         Long userId = mockTodoList.get(1).getUser().getUserId();
 
         //when - then//등록한 유저의 일정 목록에서 선택해서 가져왔을 때
-       when(todoService.getTodo(userId, 2L))
+        when(todoService.getTodo(userId, 2L))
                 .thenReturn(ResponseEntity.ok(new TodoResponseDto(mockTodoList.get(1))));
 
         //then//반환값들이 이러이러할 것이다
@@ -162,10 +163,11 @@ public class TodoMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .principal(mockPrincipal))
-                        .andExpect(status().isOk())
+                .andExpect(status().isOk())
                 .andDo(print());
 
     }
+
     //등록된 일전 전체 내림차순 조회 - to-do 3 개 정도 정의해야 할 듯
     @Test
     @DisplayName("등록된 일전 전체 내림차순 조회 - 성공")
@@ -244,16 +246,33 @@ public class TodoMvcTest {
 //                .andExpect(jsonPath("$.manager", is("관리자3-1")))
 //                .andExpect(jsonPath("$.content", is("상세내용3-1 입니다")))
 //                .andExpect(status().isOk())
-
-
     }
-    //등록된 일정 선택 삭제
-    //댓글 등록
-    //선택한 일정의 댓글 수정
-    //선택한 일정의 댓글 삭제
 
+    @Test
+    @DisplayName("등록된 일정 선택 삭제 - 성공")
+    public void test() throws Exception {
+        //given
+        Long todoId = 1L;
+        this.mockUserSetup();
+        Long userId = testUserDetails.getUser().getUserId();
+        String password = "qlalfqjsgh123";
+        TodoRequestDto requestDto = new TodoRequestDto(userId, password);
 
+        //when
+        when(todoService.deleteTodo(todoId, testUserDetails, requestDto))
+                .thenThrow(new RuntimeException("TodoService.deleteTodo 호출 예외"));
 
+        String deleteInfo = objectMapper.writeValueAsString(requestDto);
 
+        //then
+        ResultActions resultActions =
+                mvc.perform(delete("/api/todo/{todoId}", todoId)
+                                .content(deleteInfo)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .principal(mockPrincipal))
+                        .andExpect(status().isNoContent())
+                        .andDo(print());
+    }
 
 }
