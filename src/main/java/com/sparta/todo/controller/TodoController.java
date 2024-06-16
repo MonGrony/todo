@@ -47,9 +47,10 @@ public class TodoController {
 
     //등록된 일정 선택 수정
     @PostMapping("/{todoId}")
-    public TodoResponseDto modifyTodo(@RequestParam Long todoId, @RequestBody @Valid CreateTodoRequestDto requestDto,
+    public ResponseEntity<TodoResponseDto> modifyTodo(@PathVariable Long todoId, @RequestBody @Valid CreateTodoRequestDto requestDto,
                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return todoService.modifyTodo(todoId, userDetails, requestDto);
+        TodoResponseDto responseDto = todoService.modifyTodo(todoId, userDetails, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     //등록된 일정 선택 삭제

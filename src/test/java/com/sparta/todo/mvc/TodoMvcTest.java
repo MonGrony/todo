@@ -200,42 +200,42 @@ public class TodoMvcTest {
 //                .andExpect(jsonPath("$[1].todoId").value(2L))
 //                .andExpect(jsonPath("$[2].todoId").value(1L))
 
-//    @Test
-//    @DisplayName("등록된 일정 선택 수정")
-//    public void test4() throws Exception {
-//
-//        //given
-//        // mock 인증유저 세팅, 등록된 to-do 목록 세팅
-//        this.mockUserSetup();
-//        List<Todo> mockTodoList = makeMockTodoList(5);
-//        //수정할 to-do 선택과 수정할 내용
-//        CreateTodoRequestDto requestDto = CreateTodoRequestDto.builder()
-//                .title("할 일 정함3-1")
-//                .content("상세내용3-1 입니다")
-//                .manager("관리자3-1")
-//                .password("비밀번호321-1")
-//                .build();
-//
-//        String modifyInfo = objectMapper.writeValueAsString(requestDto);
-//
-//        Todo mockTodo = mockTodoList.get(2);
-//        Long todoId = mockTodo.getTodoId();
-//        Todo modifiedMockTodo = new Todo(todoId, requestDto);
-//        TodoResponseDto mockResponseDto = new TodoResponseDto(modifiedMockTodo);
-//
-//        //when
-//        when(todoService.modifyTodo(todoId, testUserDetails, requestDto)).thenReturn(mockResponseDto);
-//        //then
-//        ResultActions resultActions = mvc.perform(post("/api/todo/{todoId}", todoId)
-//                        .content(modifyInfo)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .accept(MediaType.APPLICATION_JSON)
-//                        .principal(mockPrincipal))
-//                .andExpect(status().isOk())
-//                .andDo(print());
-//
-//        String jsonResponse = resultActions.andReturn().getResponse().getContentAsString();
-//        System.out.println("JSON Response: " + jsonResponse);
+    @Test
+    @DisplayName("등록된 일정 선택 수정")
+    public void test4() throws Exception {
+
+        //given
+        // mock 인증유저 세팅, 등록된 to-do 목록 세팅
+        this.mockUserSetup();
+        List<Todo> mockTodoList = makeMockTodoList(5);
+        //수정할 to-do 선택과 수정할 내용
+        CreateTodoRequestDto requestDto = CreateTodoRequestDto.builder()
+                .title("할 일 정함3-1")
+                .content("상세내용3-1 입니다")
+                .manager("관리자3-1")
+                .password("비밀번호321-1")
+                .build();
+
+        String modifyInfo = objectMapper.writeValueAsString(requestDto);
+
+        Todo mockTodo = mockTodoList.get(2);
+        Long todoId = mockTodo.getTodoId();
+        Todo modifiedMockTodo = new Todo(todoId, requestDto);
+        TodoResponseDto mockResponseDto = new TodoResponseDto(modifiedMockTodo);
+
+        //when
+        when(todoService.modifyTodo(todoId, testUserDetails, requestDto)).thenReturn(mockResponseDto);
+        //then
+        ResultActions resultActions = mvc.perform(post("/api/todo/{todoId}", todoId)
+                        .content(modifyInfo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .principal(mockPrincipal))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        String jsonResponse = resultActions.andReturn().getResponse().getContentAsString();
+        System.out.println("JSON Response: " + jsonResponse);
 
 //        resultActions
 //                .andExpect(jsonPath("$.todo.@todoId", is(todoId)))
