@@ -9,7 +9,6 @@ import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
 import com.sparta.todo.entity.UserRoleType;
-import com.sparta.todo.repository.TodoRepository;
 import com.sparta.todo.security.UserDetailsImpl;
 import com.sparta.todo.service.CommentService;
 import com.sparta.todo.service.TodoService;
@@ -17,7 +16,6 @@ import com.sparta.todo.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,19 +25,24 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.security.Principal;
-import java.util.*;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @WebMvcTest(
         controllers = {TodoController.class, CommentController.class}, //테스트 할 Controller 지정
@@ -99,10 +102,11 @@ public class TodoCommentMvcTest {
             String content = "Content " + (i + 1);
             String manager = "Manager " + (i + 1);
             String password = "Password " + (i + 1);
-
+//            LocalDateTime createdAt = LocalDateTime.now();
             Todo todo = new Todo(todoId, title, content, manager, password);
             mockTodoList.add(todo);
         }
+
         return mockTodoList;
     }
 
@@ -122,10 +126,10 @@ public class TodoCommentMvcTest {
 
         // when - then
         mvc.perform(post("/api/todo")
-                .content(postInfo)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .principal(mockPrincipal))
+                        .content(postInfo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .principal(mockPrincipal))
                 .andDo(print());
     }
 
@@ -157,6 +161,35 @@ public class TodoCommentMvcTest {
 
     }
     //등록된 일전 전체 내림차순 조회 - to-do 3 개 정도 정의해야 할 듯
+//    @Test
+//    @DisplayName("등록된 일전 전체 내림차순 조회 - 성공")
+//    public void test() throws Exception {
+//        //given
+//        this.mockUserSetup();
+//        Long userId = testUserDetails.getUser().getUserId();
+//
+//        List<Todo> mockTodoList = makeMockTodoList(3);
+//        TodoResponseDto response1 = new TodoResponseDto(mockTodoList.get(0));
+//        TodoResponseDto response2 = new TodoResponseDto(mockTodoList.get(1));
+//        TodoResponseDto response3 = new TodoResponseDto(mockTodoList.get(2));
+//        List<TodoResponseDto> todoResponseDtoList = Arrays.asList(response1, response2, response3);
+//
+//        //when //userId 로 조회했을 때 //TodoService.getTodoList 를 사용했을 때
+//        when(todoService.getTodoList(userId)).thenReturn(todoResponseDtoList);
+//
+//        //then //생성시간 내림차순으로 조회됨
+//        mvc.perform(get("/api/todo")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .principal(mockPrincipal))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$", hasSize(3)))
+//                .andExpect(jsonPath("$[0].todoId").value(3L))
+//                .andExpect(jsonPath("$[1].todoId").value(2L))
+//                .andExpect(jsonPath("$[2].todoId").value(1L))
+//                .andDo(print());
+//    }
+
 
     //등록된 일정 선택 수정
     //등록된 일정 선택 삭제
