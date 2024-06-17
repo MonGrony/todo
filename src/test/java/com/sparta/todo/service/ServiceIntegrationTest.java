@@ -1,43 +1,67 @@
 package com.sparta.todo.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.todo.controller.UserController;
+import com.sparta.todo.dto.SignupRequestDto;
+import com.sparta.todo.dto.TodoResponseDto;
 import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
 import com.sparta.todo.entity.UserRoleType;
 import com.sparta.todo.mvc.MockSpringSecurityFilter;
+import com.sparta.todo.repository.CommentRepository;
+import com.sparta.todo.repository.TodoRepository;
 import com.sparta.todo.repository.UserRepository;
 import com.sparta.todo.security.UserDetailsImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.apache.catalina.security.SecurityConfig;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
+//@WebMvcTest(
+//        controllers = {UserController.class},
+//        excludeFilters = {
+//                @ComponentScan.Filter(
+//                        type = FilterType.ASSIGNABLE_TYPE,
+//                        classes = SecurityConfig.class)})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = UserService.class)
+@SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
 @ActiveProfiles
-@Disabled
 public class ServiceIntegrationTest {
 
-    @Autowired
     private MockMvc mvc;
 
     private Principal mockPrincipal;
@@ -57,10 +81,19 @@ public class ServiceIntegrationTest {
     @MockBean
     CommentService commentService;
 
-    @MockBean
-    UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    private UserDetailsImpl testUserDetails;
+    @Autowired
+    private TodoRepository todoRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    ResultActions resultActions;
 
 
     @BeforeEach
@@ -71,13 +104,13 @@ public class ServiceIntegrationTest {
     }
 
     public void mockUserSetup() {
-        String nickname = "salad55";
-        String username = "sarah3";
+        String nickname = "tester55";
+        String username = "integrationTester";
         UserRoleType role = UserRoleType.USER;
-        String password = "qlalfqjsgh123";
+        String password = "testPassword123";
 
         User testUser = new User(1L, nickname, username, role, password);
-        testUserDetails = new UserDetailsImpl(testUser);
+        UserDetailsImpl testUserDetails = new UserDetailsImpl(testUser);
         mockPrincipal = new UsernamePasswordAuthenticationToken(testUserDetails, testUserDetails.getAuthorities());
     }
 
@@ -97,11 +130,63 @@ public class ServiceIntegrationTest {
         return mockTodoList;
     }
 
-
-
-    // 시나리오
-
     // 회원가입
+    @Test
+    @DisplayName("회원가입 성공")
+    public void signup_success() throws Exception {
+        //given
+        //첫번째 유저
+        MultiValueMap<String, String> signupRequestForm1 = new LinkedMultiValueMap<>();
+        signupRequestForm1.add("nickname", "첫번째111");
+        signupRequestForm1.add("username", "member1");
+        signupRequestForm1.add("password", "password111");
+        signupRequestForm1.add("admin", "false");
+        signupRequestForm1.add("adminToken", "abc1231");
+        //두번째 유저
+        MultiValueMap<String, String> signupRequestForm2 = new LinkedMultiValueMap<>();
+        signupRequestForm2.add("nickname", "두번째222");
+        signupRequestForm2.add("username", "member2");
+        signupRequestForm2.add("password", "password222");
+        signupRequestForm2.add("admin", "false");
+        signupRequestForm2.add("adminToken", "abc1232");
+        //세번째 유저
+        MultiValueMap<String, String> signupRequestForm3 = new LinkedMultiValueMap<>();
+        signupRequestForm3.add("nickname", "세번째333");
+        signupRequestForm3.add("username", "member3");
+        signupRequestForm3.add("password", "password333");
+        signupRequestForm3.add("admin", "false");
+        signupRequestForm3.add("adminToken", "abc1233");
+
+        // when - then
+        mvc.perform(post("/api/user/signup")
+                        .params(signupRequestForm1)
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/api/user/login-page"))
+                .andDo(print());
+        mvc.perform(post("/api/user/signup")
+                        .params(signupRequestForm2)
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/api/user/login-page"))
+                .andDo(print());
+      mvc.perform(post("/api/user/signup")
+                        .params(signupRequestForm3)
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/api/user/login-page"))
+                .andDo(print());
+
+
+//        mvc.perform(post("/api/user/signup")
+//                        .content(objectMapper.writeValueAsString(requestDto3))
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                )
+//                .andExpect(status().is3xxRedirection())
+//                .andExpect(redirectedUrl("/api/user/login-page"))
+//                .andDo(print());
+    }
+
     // 로그인
     //
 
@@ -122,3 +207,4 @@ public class ServiceIntegrationTest {
 
     // 회원 탈퇴
 }
+
